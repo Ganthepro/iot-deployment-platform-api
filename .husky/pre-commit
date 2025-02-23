@@ -1,0 +1,7 @@
+pnpm run lint || (echo "⛔ Lint Failed" && exit 1)
+pnpm run build || (echo "⛔ Build Failed" && exit 1)
+pnpm run format || (echo "⛔ Format Failed" && exit 1)
+
+git add .
+
+echo "✅ Format, Lint and Build Passed"
