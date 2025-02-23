@@ -12,4 +12,5 @@ export const dotenvConfig = Joi.object({
         otherwise: Joi.boolean().default(false),
     }),
     CORS_ALLOW_ORIGIN: Joi.string().required(),
+    CONNECTION_STRING: Joi.string().optional(),
 });
