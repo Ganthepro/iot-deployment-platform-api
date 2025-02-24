@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    InternalServerErrorException,
+} from '@nestjs/common';
 import { RegistryService } from '../registry/registry.service';
 import { ConfigurationContent, Module } from 'azure-iothub';
 import {
@@ -83,7 +87,7 @@ export class DeploymentService {
                     );
                     break;
                 default:
-                    throw new InternalServerErrorException(
+                    throw new BadRequestException(
                         `Module ${module.moduleId} not found`,
                     );
             }
