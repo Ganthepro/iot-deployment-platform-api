@@ -12,11 +12,23 @@ import {
     RabbitMQ,
 } from 'src/shared/configs/modules.config';
 import { ModuleConfigurationDto } from './dtos/apply-configuration.dto';
-import { Module as ModuleEnum } from 'src/shared/enums/module.enum';
+import { Module as ModuleEnum } from '../shared/enums/module.enum';
+import { InjectModel } from '@nestjs/mongoose';
+import { Deployment, DeploymentDocument } from './deployment.schema';
+import { Model } from 'mongoose';
+import { DeploymentStatus } from './enums/deployment-status.enum';
+import { ModuleDeploymentService } from 'src/module-deployment/module-deployment.service';
+import { ModuleService } from 'src/module/module.service';
 
 @Injectable()
 export class DeploymentService {
-    constructor(private readonly registryService: RegistryService) {}
+    constructor(
+        @InjectModel(Deployment.name)
+        private readonly deploymentModel: Model<DeploymentDocument>,
+        private readonly moduleDeploymentService: ModuleDeploymentService,
+        private readonly registryService: RegistryService,
+        private readonly moduleService: ModuleService,
+    ) {}
 
     async getDeployment(deploymentId: string): Promise<ConfigurationContent> {
         try {
@@ -24,11 +36,7 @@ export class DeploymentService {
                 await this.registryService.registry.getConfiguration(
                     deploymentId,
                 );
-            if (response.httpResponse.complete)
-                return response.responseBody.content;
-            throw new InternalServerErrorException(
-                `Failed to get deployment with code ${response.httpResponse.statusCode}`,
-            );
+            return response.responseBody.content;
         } catch (error) {
             if (error instanceof Error)
                 throw new InternalServerErrorException(
@@ -42,31 +50,73 @@ export class DeploymentService {
         content: ConfigurationContent,
         modules: ModuleConfigurationDto[],
     ): Promise<void> {
-        content.modulesContent.$edgeAgent['properties.desired'].modules =
-            this.modulesBuilder(modules);
-        const response =
+        try {
+            content.modulesContent.$edgeAgent['properties.desired'].modules =
+                this.modulesBuilder(modules);
             await this.registryService.registry.applyConfigurationContentOnDevice(
                 deviceId,
                 content,
             );
-        if (!response.httpResponse.complete)
-            throw new InternalServerErrorException(
-                `Failed to apply configuration with code ${response.httpResponse.statusCode}`,
-            );
+            const deployment = await this.deploymentModel.create({
+                deviceId,
+                status: DeploymentStatus.Success,
+            });
+            await this.createModules(modules, deployment);
+        } catch (error) {
+            await this.deploymentModel.create({
+                deviceId,
+                status: DeploymentStatus.Failure,
+            });
+            if (error instanceof Error)
+                throw new InternalServerErrorException(
+                    `Failed to apply configuration with message: ${error.message}`,
+                );
+        }
     }
 
     async getModules(deviceId: string): Promise<Module[]> {
-        const response =
-            await this.registryService.registry.getModulesOnDevice(deviceId);
-        if (response.httpResponse.complete) return response.responseBody;
-        throw new InternalServerErrorException(
-            `Failed to get configurations with code ${response.httpResponse.statusCode}`,
-        );
+        try {
+            const response =
+                await this.registryService.registry.getModulesOnDevice(
+                    deviceId,
+                );
+            return response.responseBody;
+        } catch (error) {
+            if (error instanceof Error)
+                throw new InternalServerErrorException(
+                    `Failed to get configurations with message: ${error.message}`,
+                );
+        }
+    }
+
+    async createModules(
+        modulesConfiguration: ModuleConfigurationDto[],
+        deployment: DeploymentDocument,
+    ) {
+        try {
+            await Promise.all(
+                modulesConfiguration.map(async (moduleConfiguration) => {
+                    const module = await this.moduleService.findOne({
+                        moduleId: moduleConfiguration.moduleId,
+                    });
+                    await this.moduleDeploymentService.create({
+                        module: module,
+                        tag: moduleConfiguration.tag,
+                        deployment,
+                    });
+                }),
+            );
+        } catch (error) {
+            if (error instanceof Error)
+                throw new InternalServerErrorException(
+                    `Failed to create modules with message: ${error.message}`,
+                );
+        }
     }
 
     private modulesBuilder(modules: ModuleConfigurationDto[]) {
         const modulesConfiguration = {};
-        modules.forEach((module) => {
+        modules.forEach(async (module) => {
             switch (module.moduleId) {
                 case ModuleEnum.DataLoggerAgent:
                     modulesConfiguration[ModuleEnum.DataLoggerAgent] =
@@ -78,11 +128,13 @@ export class DeploymentService {
                     break;
                 case ModuleEnum.Postgres:
                     modulesConfiguration[ModuleEnum.Postgres] = Postgres(
+                        module.tag,
                         module.status,
                     );
                     break;
                 case ModuleEnum.RabbitMQ:
                     modulesConfiguration[ModuleEnum.RabbitMQ] = RabbitMQ(
+                        module.tag,
                         module.status,
                     );
                     break;

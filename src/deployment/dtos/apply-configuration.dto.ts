@@ -1,10 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
     IsArray,
     IsEnum,
     IsNotEmpty,
     IsOptional,
     IsString,
+    ValidateNested,
 } from 'class-validator';
 import { IsUniqueModuleId } from 'src/shared/decorators/is-unique-module-id.decorator';
 import { Module } from 'src/shared/enums/module.enum';
@@ -22,12 +24,12 @@ export class ModuleConfigurationDto {
 
     @IsString()
     @IsNotEmpty()
-    @ApiPropertyOptional({
+    @ApiProperty({
         description: 'image tag',
         example: 'latest',
         type: String,
     })
-    tag?: string;
+    tag: string;
 
     @IsString()
     @IsOptional()
@@ -62,8 +64,29 @@ export class ApplyConfigurationDto {
     @IsNotEmpty()
     @ApiProperty({
         description: 'module configurations',
-        type: [ModuleConfigurationDto],
+        type: ModuleConfigurationDto,
+        isArray: true,
+        examples: [
+            {
+                moduleId: 'data-logger-agent',
+                tag: 'latest',
+            },
+            {
+                moduleId: 'rabbitmq',
+                tag: '4.0-management',
+            },
+            {
+                moduleId: 'iaq-sensor-agent',
+                tag: 'latest',
+            },
+            {
+                moduleId: 'postgres',
+                tag: 'alpine3.20',
+            },
+        ],
     })
+    @ValidateNested({ each: true })
+    @Type(() => ModuleConfigurationDto)
     @IsUniqueModuleId()
     modules: ModuleConfigurationDto[];
 }

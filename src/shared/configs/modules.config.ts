@@ -1,8 +1,11 @@
-export const RabbitMQ = (status: 'running' | 'stopped' = 'running') => {
+export const RabbitMQ = (
+    tag: string = '4.0-management',
+    status: 'running' | 'stopped' = 'running',
+) => {
     return {
         restartPolicy: 'always',
         settings: {
-            image: 'rabbitmq:4.0-management',
+            image: `rabbitmq:${tag}`,
             createOptions:
                 '{"HostConfig":{"PortBindings":{"5672/tcp":[{"HostPort":"5672"}],"15672/tcp":[{"HostPort":"15672"}]}}}',
         },
@@ -11,7 +14,10 @@ export const RabbitMQ = (status: 'running' | 'stopped' = 'running') => {
     };
 };
 
-export const Postgres = (status: 'running' | 'stopped' = 'running') => {
+export const Postgres = (
+    tag: string = 'alpine3.20',
+    status: 'running' | 'stopped' = 'running',
+) => {
     return {
         env: {
             POSTGRES_USER: {
@@ -26,7 +32,7 @@ export const Postgres = (status: 'running' | 'stopped' = 'running') => {
         },
         restartPolicy: 'always',
         settings: {
-            image: 'postgres:alpine3.20',
+            image: `postgres:${tag}`,
             createOptions:
                 '{"HostConfig":{"PortBindings":{"5432/tcp":[{"HostPort":"5432"}]}}}',
         },
@@ -36,7 +42,7 @@ export const Postgres = (status: 'running' | 'stopped' = 'running') => {
 };
 
 export const DataLoggerAgent = (
-    tag: string,
+    tag: string = 'latest',
     status: 'running' | 'stopped' = 'running',
 ) => {
     return {
@@ -67,7 +73,7 @@ export const DataLoggerAgent = (
 };
 
 export const IQASensorAgent = (
-    tag: string,
+    tag: string = 'latest',
     status: 'running' | 'stopped' = 'running',
 ) => {
     return {

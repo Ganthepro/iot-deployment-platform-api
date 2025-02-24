@@ -1,16 +1,13 @@
 import {
-    BadGatewayException,
     Controller,
     Get,
+    Head,
     HttpCode,
     HttpStatus,
     Injectable,
-    Query,
 } from '@nestjs/common';
 import { RegistryService } from './registry.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ConnectQuery } from './dtos/connect-query.dto';
-import { Standalone } from 'src/shared/decorators/standalone.decorator';
 import { Device } from 'azure-iothub';
 
 @Controller('registry')
@@ -19,19 +16,14 @@ import { Device } from 'azure-iothub';
 export class RegistryController {
     constructor(private readonly registryService: RegistryService) {}
 
-    @Get('connect')
-    @Standalone()
+    @Head()
     @ApiResponse({
         status: HttpStatus.NO_CONTENT,
-        description: 'connect to the registry',
+        description: 'check connectivity',
     })
     @HttpCode(HttpStatus.NO_CONTENT)
-    async connect(@Query() query: ConnectQuery) {
-        this.registryService.connect(query.connectionString);
-        const connectivity = this.registryService.checkConnectivity();
-        if (!connectivity)
-            throw new BadGatewayException('IoT Hub is not available');
-        return;
+    async checkConnectivity() {
+        return await this.registryService.checkConnectivity();
     }
 
     @Get('device')

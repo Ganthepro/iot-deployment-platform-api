@@ -3,6 +3,7 @@ import {
     Injectable,
     InternalServerErrorException,
     OnModuleInit,
+    ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GLOBAL_CONFIG } from 'src/shared/constants/global-config.constant';
@@ -24,16 +25,22 @@ export class RegistryService implements OnModuleInit {
             );
     }
 
-    connect(connectionString: string): void {
-        this.registry = Registry.fromConnectionString(connectionString);
+    private connect(connectionString: string): void {
+        try {
+            this.registry = Registry.fromConnectionString(connectionString);
+        } catch (error) {
+            if (error instanceof Error)
+                throw new InternalServerErrorException(error.message);
+        }
     }
 
-    async checkConnectivity(): Promise<boolean> {
+    async checkConnectivity(): Promise<void> {
         try {
             await this.registry.list();
-            return true;
         } catch {
-            return false;
+            throw new ServiceUnavailableException(
+                'Failed to connect to registry',
+            );
         }
     }
 
