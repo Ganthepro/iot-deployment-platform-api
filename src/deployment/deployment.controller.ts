@@ -59,11 +59,12 @@ export class DeploymentController {
         @Body() applyConfigurationDto: ApplyConfigurationDto,
     ) {
         const configuration = await this.deploymentService.getDeployment(
-            applyConfigurationDto.deploymentId,
+            applyConfigurationDto.baseTemplatedeploymentId,
         );
         return await this.deploymentService.applyConfiguration(
             applyConfigurationDto.deviceId,
             configuration,
+            applyConfigurationDto.modules,
         );
     }
 }

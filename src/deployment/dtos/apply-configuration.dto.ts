@@ -1,5 +1,43 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+    IsArray,
+    IsEnum,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+} from 'class-validator';
+import { IsUniqueModuleId } from 'src/shared/decorators/is-unique-module-id.decorator';
+import { Module } from 'src/shared/enums/module.enum';
+
+export class ModuleConfigurationDto {
+    @IsEnum(Module)
+    @IsNotEmpty()
+    @ApiProperty({
+        description: 'module id',
+        example: Module.DataLoggerAgent,
+        type: String,
+        enum: Module,
+    })
+    moduleId: Module;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiPropertyOptional({
+        description: 'image tag',
+        example: 'latest',
+        type: String,
+    })
+    tag?: string;
+
+    @IsString()
+    @IsOptional()
+    @ApiPropertyOptional({
+        description: 'module version',
+        example: 'running',
+        type: String,
+    })
+    status?: 'running' | 'stopped';
+}
 
 export class ApplyConfigurationDto {
     @IsString()
@@ -15,8 +53,17 @@ export class ApplyConfigurationDto {
     @IsNotEmpty()
     @ApiProperty({
         description: 'deployment id',
-        example: 'infrastucture',
+        example: 'base-template',
         type: String,
     })
-    deploymentId: string;
+    baseTemplatedeploymentId: string;
+
+    @IsArray()
+    @IsNotEmpty()
+    @ApiProperty({
+        description: 'module configurations',
+        type: [ModuleConfigurationDto],
+    })
+    @IsUniqueModuleId()
+    modules: ModuleConfigurationDto[];
 }
