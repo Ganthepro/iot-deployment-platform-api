@@ -6,6 +6,25 @@ import { ConfigurationContent, Module } from 'azure-iothub';
 export class DeploymentService {
     constructor(private readonly registryService: RegistryService) {}
 
+    async getDeployment(deploymentId: string): Promise<ConfigurationContent> {
+        try {
+            const response =
+                await this.registryService.registry.getConfiguration(
+                    deploymentId,
+                );
+            if (response.httpResponse.complete)
+                return response.responseBody.content;
+            throw new InternalServerErrorException(
+                `Failed to get deployment with code ${response.httpResponse.statusCode}`,
+            );
+        } catch (error) {
+            if (error instanceof Error)
+                throw new InternalServerErrorException(
+                    `Failed to get deployment with code ${error.message}`,
+                );
+        }
+    }
+
     async applyConfiguration(
         deviceId: string,
         content: ConfigurationContent,

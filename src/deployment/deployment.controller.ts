@@ -1,6 +1,8 @@
 import {
+    Body,
     Controller,
     Get,
+    HttpCode,
     HttpStatus,
     Injectable,
     Param,
@@ -8,12 +10,28 @@ import {
 } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DeploymentService } from './deployment.service';
+import { ApplyConfigurationDto } from './dtos/apply-configuration.dto';
 
 @Injectable()
 @Controller('deployment')
 @ApiTags('Deployment')
 export class DeploymentController {
     constructor(private readonly deploymentService: DeploymentService) {}
+
+    @Get(':deploymentId')
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'get deployment',
+    })
+    @ApiParam({
+        name: 'deploymentId',
+        required: true,
+        example: 'infrastructure',
+        description: 'deployment id',
+    })
+    async getDeployment(@Param('deploymentId') deploymentId: string) {
+        return await this.deploymentService.getDeployment(deploymentId);
+    }
 
     @Get(':deviceId/modules')
     @ApiResponse({
@@ -31,91 +49,20 @@ export class DeploymentController {
         return await this.deploymentService.getModules(deviceId);
     }
 
-    @Post(':deviceId')
+    @Post()
     @ApiResponse({
         status: HttpStatus.NO_CONTENT,
         description: 'apply configuration',
     })
-    @ApiParam({
-        name: 'deviceId',
-        required: true,
-        example: 'building-a',
-        description: 'device id',
-    })
-    async applyConfiguration(@Param('deviceId') deviceId: string) {
-        const configuration = {
-            modulesContent: {
-                $edgeAgent: {
-                    'properties.desired': {
-                        schemaVersion: '1.1',
-                        runtime: {
-                            type: 'docker',
-                            settings: {
-                                registryCredentials: {
-                                    tamtikorn: {
-                                        address: 'tamtikorn.azurecr.io',
-                                        password:
-                                            'AyqmDBcIiKoJEo/g+irxpJbL+e1B4Lf2lOVf729k6K+ACRC0pOei',
-                                        username: 'tamtikorn',
-                                    },
-                                },
-                            },
-                        },
-                        systemModules: {
-                            edgeAgent: {
-                                settings: {
-                                    image: 'mcr.microsoft.com/azureiotedge-agent:1.5',
-                                },
-                                type: 'docker',
-                            },
-                            edgeHub: {
-                                restartPolicy: 'always',
-                                settings: {
-                                    image: 'mcr.microsoft.com/azureiotedge-hub:1.5',
-                                    createOptions:
-                                        '{"HostConfig":{"PortBindings":{"443/tcp":[{"HostPort":"443"}],"5671/tcp":[{"HostPort":"5671"}],"8883/tcp":[{"HostPort":"8883"}]}}}',
-                                },
-                                status: 'running',
-                                type: 'docker',
-                            },
-                        },
-                        modules: {
-                            postgres: {
-                                env: {
-                                    POSTGRES_USER: {
-                                        value: 'postgres',
-                                    },
-                                    POSTGRES_PASSWORD: {
-                                        value: 'ganza112',
-                                    },
-                                    POSTGRES_DB: {
-                                        value: 'postgres',
-                                    },
-                                },
-                                restartPolicy: 'always',
-                                settings: {
-                                    image: 'postgres:alpine3.20',
-                                },
-                                startupOrder: 200,
-                                status: 'running',
-                                type: 'docker',
-                            },
-                        },
-                    },
-                },
-                $edgeHub: {
-                    'properties.desired': {
-                        schemaVersion: '1.1',
-                        storeAndForwardConfiguration: {
-                            timeToLiveSecs: 7200,
-                        },
-                        routes: {},
-                    },
-                },
-            },
-        };
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async applyConfiguration(
+        @Body() applyConfigurationDto: ApplyConfigurationDto,
+    ) {
+        const configuration = await this.deploymentService.getDeployment(
+            applyConfigurationDto.deploymentId,
+        );
         return await this.deploymentService.applyConfiguration(
-            deviceId,
+            applyConfigurationDto.deviceId,
             configuration,
         );
     }
