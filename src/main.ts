@@ -34,8 +34,10 @@ async function bootstrap() {
     if (configService.getOrThrow<string>(GLOBAL_CONFIG.IS_DEVELOPMENT)) {
         const config = new DocumentBuilder()
             .addBearerAuth()
-            .setTitle('NextGen AI Camp API')
-            .setDescription('This is the NextGen AI Camp API documentation')
+            .setTitle('IOT Deployment Platform API')
+            .setDescription(
+                'This is the IOT Deployment Platform API documentation',
+            )
             .setVersion('dev')
             .build();
         const documentFactory = () => SwaggerModule.createDocument(app, config);

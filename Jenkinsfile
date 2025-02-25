@@ -24,25 +24,11 @@ pipeline {
                 }
             }
         }
-        // stage('Build') {
-        //     steps {
-        //         script {
-        //             sh 'docker build --no-cache -t $JOB_NAME:latest .'
-        //         }
-        //     }
-        // }
-
-        // stage('Deployment') {
-        //     steps {
-        //         script {
-        //             sh 'docker run -e DOTENV_KEY=$DOTENV_KEY -e AZURE_CLIENT_ID=$AZURE_CLIENT_ID -e AZURE_TENANT_ID=$AZURE_TENANT_ID -e AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET -p 3000:3000 -d --name $JOB_NAME $JOB_NAME:latest'
-        //         }
-        //     }
-        // }
     }
     
     post {
         always {
+            sh 'echo y | docker system prune -a'
             cleanWs(cleanWhenNotBuilt: false,
                 deleteDirs: true,
                 disableDeferredWipeout: true,
