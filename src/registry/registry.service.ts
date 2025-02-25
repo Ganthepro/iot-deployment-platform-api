@@ -15,14 +15,11 @@ export class RegistryService implements OnModuleInit {
     constructor(private readonly configService: ConfigService) {}
 
     onModuleInit() {
-        if (
-            this.configService.getOrThrow<boolean>(GLOBAL_CONFIG.IS_DEVELOPMENT)
-        )
-            this.connect(
-                this.configService.getOrThrow<string>(
-                    GLOBAL_CONFIG.CONNECTION_STRING,
-                ),
-            );
+        this.connect(
+            this.configService.getOrThrow<string>(
+                GLOBAL_CONFIG.CONNECTION_STRING,
+            ),
+        );
     }
 
     private connect(connectionString: string): void {

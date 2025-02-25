@@ -21,10 +21,12 @@ export class ModuleService implements OnApplicationBootstrap {
         const devices = await this.deviceService.findAll();
         devices.forEach(async (device) => {
             Object.values(Module).forEach(async (module) => {
-                await this.create({
-                    moduleId: module,
-                    device,
-                });
+                try {
+                    await this.create({
+                        moduleId: module,
+                        device,
+                    });
+                } catch {}
             });
         });
     }

@@ -13,6 +13,9 @@ import { ModuleDeploymentModule } from './module-deployment/module-deployment.mo
 import { ModuleModule } from './module/module.module';
 import { DeviceModule } from './device/device.module';
 import { ContainerModule } from './container/container.module';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Module({
     imports: [

@@ -15,9 +15,11 @@ export class DeviceService implements OnModuleInit {
     async onModuleInit() {
         const devices = await this.registryService.getDevices();
         devices.forEach(async (device) => {
-            await this.create({
-                deviceId: device.deviceId,
-            });
+            try {
+                await this.create({
+                    deviceId: device.deviceId,
+                });
+            } catch {}
         });
     }
 
