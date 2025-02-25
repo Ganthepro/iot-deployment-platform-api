@@ -25,7 +25,7 @@ pipeline {
         stage('Deployment') {
             steps {
                 script {
-                    sh 'docker run -e DOTENV_KEY=$DOTENV_KEY -p 3000:3000 $JOB_NAME:$BUILD_NUMBER'
+                    sh 'docker run -e DOTENV_KEY=$DOTENV_KEY -p 3000:3000 -d $JOB_NAME:$BUILD_NUMBER'
                 }
             }
         }
