@@ -1,6 +1,6 @@
 export const RabbitMQ = (
-    tag: string = '4.0-management',
     status: 'running' | 'stopped' = 'running',
+    tag: string = '4.0-management',
 ) => {
     return {
         restartPolicy: 'always',
@@ -15,8 +15,8 @@ export const RabbitMQ = (
 };
 
 export const Postgres = (
-    tag: string = 'alpine3.20',
     status: 'running' | 'stopped' = 'running',
+    tag: string = 'alpine3.20',
 ) => {
     return {
         env: {
@@ -41,9 +41,39 @@ export const Postgres = (
     };
 };
 
-export const DataLoggerAgent = (
-    tag: string = 'latest',
+export const API = (
     status: 'running' | 'stopped' = 'running',
+    tag: string = 'latest',
+) => {
+    return {
+        env: {
+            DB_USERNAME: {
+                value: 'postgres',
+            },
+            DB_HOST: {
+                value: 'postgres',
+            },
+            DB_DATABASE: {
+                value: 'postgres',
+            },
+            DB_PASSWORD: {
+                value: 'P@ssw0rd!',
+            },
+        },
+        restartPolicy: 'always',
+        settings: {
+            image: `tamtikorn.azurecr.io/tamtikorn/api:${tag}`,
+            createOptions:
+                '{"HostConfig":{"PortBindings":{"8000/tcp":[{"HostPort":"8000"}]}}}',
+        },
+        status,
+        type: 'docker',
+    };
+};
+
+export const DataLoggerAgent = (
+    status: 'running' | 'stopped' = 'running',
+    tag: string = 'latest',
 ) => {
     return {
         env: {
@@ -73,8 +103,8 @@ export const DataLoggerAgent = (
 };
 
 export const IQASensorAgent = (
-    tag: string = 'latest',
     status: 'running' | 'stopped' = 'running',
+    tag: string = 'latest',
 ) => {
     return {
         env: {

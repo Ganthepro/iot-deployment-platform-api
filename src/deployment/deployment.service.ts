@@ -6,6 +6,7 @@ import {
 import { RegistryService } from '../registry/registry.service';
 import { ConfigurationContent, Module } from 'azure-iothub';
 import {
+    API,
     DataLoggerAgent,
     IQASensorAgent,
     Postgres,
@@ -19,6 +20,7 @@ import { Model } from 'mongoose';
 import { DeploymentStatus } from './enums/deployment-status.enum';
 import { ModuleDeploymentService } from 'src/module-deployment/module-deployment.service';
 import { ModuleService } from 'src/module/module.service';
+import { DeviceService } from 'src/device/device.service';
 
 @Injectable()
 export class DeploymentService {
@@ -28,7 +30,19 @@ export class DeploymentService {
         private readonly moduleDeploymentService: ModuleDeploymentService,
         private readonly registryService: RegistryService,
         private readonly moduleService: ModuleService,
+        private readonly deviceService: DeviceService,
     ) {}
+
+    async autoUpdateConfiguration(): Promise<void> {
+        try {
+            await this.deviceService.findAll();
+        } catch (error) {
+            if (error instanceof Error)
+                throw new InternalServerErrorException(
+                    `Failed to auto update configuration with message: ${error.message}`,
+                );
+        }
+    }
 
     async getDeployment(deploymentId: string): Promise<ConfigurationContent> {
         try {
@@ -50,6 +64,7 @@ export class DeploymentService {
         content: ConfigurationContent,
         modules: ModuleConfigurationDto[],
     ): Promise<void> {
+        const device = await this.deviceService.findOne({ deviceId });
         try {
             content.modulesContent.$edgeAgent['properties.desired'].modules =
                 this.modulesBuilder(modules);
@@ -58,13 +73,13 @@ export class DeploymentService {
                 content,
             );
             const deployment = await this.deploymentModel.create({
-                deviceId,
+                device,
                 status: DeploymentStatus.Success,
             });
             await this.createModules(modules, deployment);
         } catch (error) {
             await this.deploymentModel.create({
-                deviceId,
+                device,
                 status: DeploymentStatus.Failure,
             });
             if (error instanceof Error)
@@ -100,7 +115,7 @@ export class DeploymentService {
                         moduleId: moduleConfiguration.moduleId,
                     });
                     await this.moduleDeploymentService.create({
-                        module: module,
+                        module,
                         tag: moduleConfiguration.tag,
                         deployment,
                     });
@@ -120,22 +135,26 @@ export class DeploymentService {
             switch (module.moduleId) {
                 case ModuleEnum.DataLoggerAgent:
                     modulesConfiguration[ModuleEnum.DataLoggerAgent] =
-                        DataLoggerAgent(module.tag, module.status);
+                        DataLoggerAgent(module.status, module.tag);
                     break;
                 case ModuleEnum.IQASensorAgent:
                     modulesConfiguration[ModuleEnum.IQASensorAgent] =
-                        IQASensorAgent(module.tag, module.status);
+                        IQASensorAgent(module.status, module.tag);
                     break;
                 case ModuleEnum.Postgres:
                     modulesConfiguration[ModuleEnum.Postgres] = Postgres(
-                        module.tag,
                         module.status,
                     );
                     break;
                 case ModuleEnum.RabbitMQ:
                     modulesConfiguration[ModuleEnum.RabbitMQ] = RabbitMQ(
-                        module.tag,
                         module.status,
+                    );
+                    break;
+                case ModuleEnum.API:
+                    modulesConfiguration[ModuleEnum.API] = API(
+                        module.status,
+                        module.tag,
                     );
                     break;
                 default:

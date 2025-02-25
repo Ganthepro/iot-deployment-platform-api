@@ -15,4 +15,5 @@ export const dotenvConfig = Joi.object({
     CONNECTION_STRING: Joi.string().optional(),
     SUBSCRIPTION_ID: Joi.string().required(),
     MONGO_URI: Joi.string().required(),
+    ACR_URL: Joi.string().required(),
 });

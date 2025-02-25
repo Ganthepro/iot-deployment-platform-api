@@ -11,6 +11,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GLOBAL_CONFIG } from './shared/constants/global-config.constant';
 import { ModuleDeploymentModule } from './module-deployment/module-deployment.module';
 import { ModuleModule } from './module/module.module';
+import { DeviceModule } from './device/device.module';
+import { ContainerModule } from './container/container.module';
 
 @Module({
     imports: [
@@ -31,6 +33,8 @@ import { ModuleModule } from './module/module.module';
         DeploymentModule,
         ModuleDeploymentModule,
         ModuleModule,
+        DeviceModule,
+        ContainerModule,
     ],
     controllers: [AppController],
     providers: [

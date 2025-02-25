@@ -6,7 +6,7 @@ import {
     HttpStatus,
     Injectable,
     Param,
-    Post,
+    Patch,
 } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DeploymentService } from './deployment.service';
@@ -49,7 +49,7 @@ export class DeploymentController {
         return await this.deploymentService.getModules(deviceId);
     }
 
-    @Post()
+    @Patch()
     @ApiResponse({
         status: HttpStatus.NO_CONTENT,
         description: 'apply configuration',
@@ -66,5 +66,15 @@ export class DeploymentController {
             configuration,
             applyConfigurationDto.modules,
         );
+    }
+
+    @Patch('auto-update')
+    @ApiResponse({
+        status: HttpStatus.NO_CONTENT,
+        description: 'auto update',
+    })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async autoUpdate() {
+        // return await this.deploymentService.autoUpdate();
     }
 }

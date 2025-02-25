@@ -30,10 +30,8 @@ export class ModuleDeployment {
     })
     module: ModuleDocument;
 
-    @Prop({
-        required: true,
-    })
-    tag: string;
+    @Prop()
+    tag?: string;
 }
 
 export const ModuleDeploymentSchema =

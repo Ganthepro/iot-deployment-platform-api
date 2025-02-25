@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { DeploymentStatus } from './enums/deployment-status.enum';
+import { DeviceDocument, Device } from '../device/device.schema';
+import * as autopopulate from 'mongoose-autopopulate';
 
 export type DeploymentDocument = HydratedDocument<Deployment>;
 
@@ -11,8 +13,10 @@ export type DeploymentDocument = HydratedDocument<Deployment>;
 export class Deployment {
     @Prop({
         required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Device.name,
     })
-    deviceId: string;
+    device: DeviceDocument;
 
     @Prop({
         required: true,
@@ -31,5 +35,6 @@ export const DeploymentSchema = SchemaFactory.createForClass(Deployment);
 
 export const DeploymentSchemaFactory = () => {
     const schema = DeploymentSchema;
+    schema.plugin(autopopulate as any);
     return schema;
 };

@@ -23,13 +23,13 @@ export class ModuleConfigurationDto {
     moduleId: Module;
 
     @IsString()
-    @IsNotEmpty()
-    @ApiProperty({
+    @IsOptional()
+    @ApiPropertyOptional({
         description: 'image tag',
         example: 'latest',
         type: String,
     })
-    tag: string;
+    tag?: string;
 
     @IsString()
     @IsOptional()
@@ -68,20 +68,22 @@ export class ApplyConfigurationDto {
         isArray: true,
         examples: [
             {
-                moduleId: 'data-logger-agent',
+                moduleId: 'data-logger',
                 tag: 'latest',
             },
             {
                 moduleId: 'rabbitmq',
-                tag: '4.0-management',
             },
             {
-                moduleId: 'iaq-sensor-agent',
+                moduleId: 'iaq-sensor',
+                tag: 'latest',
+            },
+            {
+                moduleId: 'api',
                 tag: 'latest',
             },
             {
                 moduleId: 'postgres',
-                tag: 'alpine3.20',
             },
         ],
     })

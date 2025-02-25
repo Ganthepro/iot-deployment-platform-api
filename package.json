@@ -21,6 +21,8 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@azure/container-registry": "^1.1.0",
+    "@azure/identity": "^4.7.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^10.0.0",
