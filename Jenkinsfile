@@ -17,7 +17,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh 'docker build --no-cache -t $JOB_NAME:$BUILD_NUMBER .'
+                    sh 'docker build --no-cache -t $JOB_NAME:latest .'
                 }
             }
         }
@@ -25,7 +25,7 @@ pipeline {
         stage('Deployment') {
             steps {
                 script {
-                    sh 'docker run -e DOTENV_KEY=$DOTENV_KEY -p 3000:3000 -d $JOB_NAME:$BUILD_NUMBER'
+                    sh 'docker run -e DOTENV_KEY=$DOTENV_KEY -p 3000:3000 -d $JOB_NAME:latest'
                 }
             }
         }
