@@ -18,7 +18,7 @@ export class ModuleDeployment {
         required: true,
         type: mongoose.Schema.Types.ObjectId,
         ref: Deployment.name,
-        // autopopulate: true,
+        autopopulate: true,
     })
     deployment: DeploymentDocument;
 

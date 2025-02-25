@@ -24,12 +24,6 @@ export class Module {
         ref: Device.name,
     })
     device: DeviceDocument;
-
-    // @Prop({
-    //     type: [String],
-    //     default: null,
-    // })
-    // tags: string[];
 }
 
 export const ModuleSchema = SchemaFactory.createForClass(Module);

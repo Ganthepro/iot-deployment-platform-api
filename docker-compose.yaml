@@ -12,4 +12,4 @@ services:
     environment:
       - TZ=Asia/Bangkok
     ports:
-      - '${PORT}:${PORT}'
+      - '3000:3000'
