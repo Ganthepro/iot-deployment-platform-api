@@ -33,7 +33,6 @@ pipeline {
     
     post {
         always {
-            sh 'echo y | docker system prune -a'
             cleanWs(cleanWhenNotBuilt: false,
                 deleteDirs: true,
                 disableDeferredWipeout: true,
