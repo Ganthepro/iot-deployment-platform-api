@@ -15,6 +15,7 @@ export class Deployment {
         required: true,
         type: mongoose.Schema.Types.ObjectId,
         ref: Device.name,
+        autopopulate: true,
     })
     device: DeviceDocument;
 

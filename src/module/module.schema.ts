@@ -25,17 +25,11 @@ export class Module {
     })
     device: DeviceDocument;
 
-    @Prop({
-        type: [String],
-        default: null,
-    })
-    tags: string[];
-
-    @Prop({
-        required: true,
-        default: true,
-    })
-    autoUpdate: boolean;
+    // @Prop({
+    //     type: [String],
+    //     default: null,
+    // })
+    // tags: string[];
 }
 
 export const ModuleSchema = SchemaFactory.createForClass(Module);

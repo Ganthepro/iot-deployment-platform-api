@@ -21,6 +21,7 @@ import { DeploymentStatus } from './enums/deployment-status.enum';
 import { ModuleDeploymentService } from 'src/module-deployment/module-deployment.service';
 import { ModuleService } from 'src/module/module.service';
 import { DeviceService } from 'src/device/device.service';
+import { ModuleDeploymentDocument } from 'src/module-deployment/module-deployment.schema';
 
 @Injectable()
 export class DeploymentService {
@@ -33,6 +34,32 @@ export class DeploymentService {
         private readonly deviceService: DeviceService,
     ) {}
 
+    async getDeployments(): Promise<ModuleDeploymentDocument[]> {
+        try {
+            return await this.moduleDeploymentService.findAll();
+        } catch (error) {
+            if (error instanceof Error)
+                throw new InternalServerErrorException(
+                    `Failed to get deployments with message: ${error.message}`,
+                );
+        }
+    }
+
+    async getDeployment(
+        deploymentId: string,
+    ): Promise<ModuleDeploymentDocument[]> {
+        try {
+            return await this.moduleDeploymentService.findAll({
+                deployment: deploymentId,
+            });
+        } catch (error) {
+            if (error instanceof Error)
+                throw new InternalServerErrorException(
+                    `Failed to get deployment modules with message: ${error.message}`,
+                );
+        }
+    }
+
     async autoUpdateConfiguration(): Promise<void> {
         try {
             await this.deviceService.findAll();
@@ -44,7 +71,9 @@ export class DeploymentService {
         }
     }
 
-    async getDeployment(deploymentId: string): Promise<ConfigurationContent> {
+    async getConfiguration(
+        deploymentId: string,
+    ): Promise<ConfigurationContent> {
         try {
             const response =
                 await this.registryService.registry.getConfiguration(

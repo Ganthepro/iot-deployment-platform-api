@@ -1,3 +1,5 @@
+import { Module } from '../enums/module.enum';
+
 export const RabbitMQ = (
     status: 'running' | 'stopped' = 'running',
     tag: string = '4.0-management',
@@ -5,7 +7,7 @@ export const RabbitMQ = (
     return {
         restartPolicy: 'always',
         settings: {
-            image: `rabbitmq:${tag}`,
+            image: `${Module.RabbitMQ}:${tag}`,
             createOptions:
                 '{"HostConfig":{"PortBindings":{"5672/tcp":[{"HostPort":"5672"}],"15672/tcp":[{"HostPort":"15672"}]}}}',
         },
@@ -32,7 +34,7 @@ export const Postgres = (
         },
         restartPolicy: 'always',
         settings: {
-            image: `postgres:${tag}`,
+            image: `${Module.Postgres}:${tag}`,
             createOptions:
                 '{"HostConfig":{"PortBindings":{"5432/tcp":[{"HostPort":"5432"}]}}}',
         },
@@ -62,7 +64,7 @@ export const API = (
         },
         restartPolicy: 'always',
         settings: {
-            image: `tamtikorn.azurecr.io/tamtikorn/api:${tag}`,
+            image: `tamtikorn.azurecr.io/${Module.API}:${tag}`,
             createOptions:
                 '{"HostConfig":{"PortBindings":{"8000/tcp":[{"HostPort":"8000"}]}}}',
         },
@@ -95,7 +97,7 @@ export const DataLoggerAgent = (
         },
         restartPolicy: 'always',
         settings: {
-            image: `tamtikorn.azurecr.io/tamtikorn/data-logger:${tag}`,
+            image: `tamtikorn.azurecr.io/${Module.DataLoggerAgent}:${tag}`,
         },
         status,
         type: 'docker',
@@ -126,7 +128,7 @@ export const IQASensorAgent = (
         },
         restartPolicy: 'always',
         settings: {
-            image: `tamtikorn.azurecr.io/tamtikorn/iaq-sensor:${tag}`,
+            image: `tamtikorn.azurecr.io/${Module.IQASensorAgent}:${tag}`,
         },
         status,
         type: 'docker',

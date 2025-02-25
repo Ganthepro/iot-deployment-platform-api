@@ -1,6 +1,7 @@
 import { Injectable, Controller, Get, Query, HttpStatus } from '@nestjs/common';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ContainerService } from './container.service';
+import { Module } from 'src/shared/enums/module.enum';
 
 @Controller('container')
 @Injectable()
@@ -13,8 +14,9 @@ export class ContainerController {
         name: 'repositoryName',
         required: true,
         type: String,
+        enum: [Module.API, Module.DataLoggerAgent, Module.IQASensorAgent],
         description: 'Repository name',
-        example: 'tamtikorn/api',
+        example: Module.API,
     })
     @ApiResponse({
         status: HttpStatus.OK,
@@ -22,7 +24,7 @@ export class ContainerController {
         type: String,
         isArray: true,
     })
-    async getTags(@Query('repositoryName') repositoryName: string) {
+    async getTags(@Query('repositoryName') repositoryName: Module) {
         return await this.containerService.getTags(repositoryName);
     }
 }

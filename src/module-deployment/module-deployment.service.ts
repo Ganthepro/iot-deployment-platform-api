@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, RootFilterQuery } from 'mongoose';
 import {
     ModuleDeployment,
     ModuleDeploymentDocument,
@@ -15,5 +15,11 @@ export class ModuleDeploymentService {
 
     async create(module: ModuleDeployment): Promise<ModuleDeploymentDocument> {
         return await this.moduleDeploymentModel.create(module);
+    }
+
+    async findAll(
+        filter?: RootFilterQuery<ModuleDeploymentDocument>,
+    ): Promise<ModuleDeploymentDocument[]> {
+        return await this.moduleDeploymentModel.find(filter);
     }
 }

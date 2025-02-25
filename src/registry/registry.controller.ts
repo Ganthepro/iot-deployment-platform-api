@@ -12,7 +12,7 @@ import { Device } from 'azure-iothub';
 
 @Controller('registry')
 @Injectable()
-@ApiTags('registry')
+@ApiTags('Registry')
 export class RegistryController {
     constructor(private readonly registryService: RegistryService) {}
 

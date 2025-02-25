@@ -11,6 +11,7 @@ import {
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DeploymentService } from './deployment.service';
 import { ApplyConfigurationDto } from './dtos/apply-configuration.dto';
+import { ObjectId } from 'src/shared/decorators/object-id.decorator';
 
 @Injectable()
 @Controller('deployment')
@@ -18,19 +19,28 @@ import { ApplyConfigurationDto } from './dtos/apply-configuration.dto';
 export class DeploymentController {
     constructor(private readonly deploymentService: DeploymentService) {}
 
-    @Get(':deploymentId')
+    @Get()
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'list all deployments',
+        isArray: true,
+    })
+    async getDeployments() {
+        return await this.deploymentService.getDeployments();
+    }
+
+    @Get(':id')
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'get deployment',
     })
     @ApiParam({
-        name: 'deploymentId',
-        required: true,
-        example: 'infrastructure',
-        description: 'deployment id',
+        name: 'id',
+        description: 'Deployment ID',
+        type: String,
     })
-    async getDeployment(@Param('deploymentId') deploymentId: string) {
-        return await this.deploymentService.getDeployment(deploymentId);
+    async getDeployment(@ObjectId('id') id: string) {
+        return await this.deploymentService.getDeployment(id);
     }
 
     @Get(':deviceId/modules')
@@ -58,7 +68,7 @@ export class DeploymentController {
     async applyConfiguration(
         @Body() applyConfigurationDto: ApplyConfigurationDto,
     ) {
-        const configuration = await this.deploymentService.getDeployment(
+        const configuration = await this.deploymentService.getConfiguration(
             applyConfigurationDto.baseTemplatedeploymentId,
         );
         return await this.deploymentService.applyConfiguration(
@@ -66,15 +76,5 @@ export class DeploymentController {
             configuration,
             applyConfigurationDto.modules,
         );
-    }
-
-    @Patch('auto-update')
-    @ApiResponse({
-        status: HttpStatus.NO_CONTENT,
-        description: 'auto update',
-    })
-    @HttpCode(HttpStatus.NO_CONTENT)
-    async autoUpdate() {
-        // return await this.deploymentService.autoUpdate();
     }
 }

@@ -43,13 +43,4 @@ export class ModuleService implements OnApplicationBootstrap {
                 throw new NotFoundException(error.message);
         }
     }
-
-    async updateTags(moduleId: string, tags: string[]): Promise<void> {
-        try {
-            await this.moduleModel.updateOne({ moduleId }, { tags });
-        } catch (error) {
-            if (error instanceof Error)
-                throw new NotFoundException(error.message);
-        }
-    }
 }
