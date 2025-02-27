@@ -85,12 +85,14 @@ export class DeploymentController {
     async getDeploymentsByDeviceId(
         @Param('deviceId') deviceId: string,
         @Query('isLatest') isLatest: boolean = false,
-    ): Promise<DeploymentResponseDto> {
-        const deployments = await this.deploymentService.findOne({
+    ): Promise<DeploymentResponseDto[]> {
+        const deployments = await this.deploymentService.find({
             deviceId,
             isLatest,
         });
-        return new DeploymentResponseDto(deployments);
+        return deployments.map(
+            (deployment) => new DeploymentResponseDto(deployment),
+        );
     }
 
     @Post()
