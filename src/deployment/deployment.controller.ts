@@ -6,6 +6,7 @@ import {
     HttpStatus,
     Injectable,
     InternalServerErrorException,
+    Param,
     Post,
     Query,
 } from '@nestjs/common';
@@ -72,15 +73,17 @@ export class DeploymentController {
         name: 'deviceId',
         description: 'Device ID',
         type: String,
+        example: 'building-a',
     })
     @ApiQuery({
         name: 'isLatest',
         description: 'Get the latest deployment',
         type: Boolean,
+        example: true,
         required: false,
     })
     async getDeploymentsByDeviceId(
-        @ObjectId('deviceId') deviceId: string,
+        @Param('deviceId') deviceId: string,
         @Query('isLatest') isLatest: boolean = false,
     ): Promise<DeploymentResponseDto> {
         const deployments = await this.deploymentService.findOne({
