@@ -14,7 +14,7 @@ export function IsUniqueModuleId(validationOptions?: ValidationOptions) {
                         return false;
                     }
                     const moduleIds = value.map((module) => module.moduleId);
-                    return new Set(moduleIds).size === moduleIds.length; // Ensures uniqueness
+                    return new Set(moduleIds).size === moduleIds.length;
                 },
                 defaultMessage() {
                     return `moduleId must be unique within the modules array`;

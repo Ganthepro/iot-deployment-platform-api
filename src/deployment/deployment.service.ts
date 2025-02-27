@@ -16,10 +16,9 @@ import { ModuleConfigurationDto } from './dtos/apply-configuration.dto';
 import { Module as ModuleEnum } from '../shared/enums/module.enum';
 import { InjectModel } from '@nestjs/mongoose';
 import { Deployment, DeploymentDocument } from './deployment.schema';
-import { Model } from 'mongoose';
+import { Model, RootFilterQuery } from 'mongoose';
 import { DeploymentStatus } from './enums/deployment-status.enum';
 import { ModuleDeploymentService } from 'src/module-deployment/module-deployment.service';
-import { ModuleService } from 'src/module/module.service';
 import { DeviceService } from 'src/device/device.service';
 import { ModuleDeploymentDocument } from 'src/module-deployment/module-deployment.schema';
 
@@ -30,7 +29,6 @@ export class DeploymentService {
         private readonly deploymentModel: Model<DeploymentDocument>,
         private readonly moduleDeploymentService: ModuleDeploymentService,
         private readonly registryService: RegistryService,
-        private readonly moduleService: ModuleService,
         private readonly deviceService: DeviceService,
     ) {}
 
@@ -60,17 +58,6 @@ export class DeploymentService {
         }
     }
 
-    async autoUpdateConfiguration(): Promise<void> {
-        try {
-            await this.deviceService.findAll();
-        } catch (error) {
-            if (error instanceof Error)
-                throw new InternalServerErrorException(
-                    `Failed to auto update configuration with message: ${error.message}`,
-                );
-        }
-    }
-
     async getConfiguration(
         deploymentId: string,
     ): Promise<ConfigurationContent> {
@@ -84,6 +71,32 @@ export class DeploymentService {
             if (error instanceof Error)
                 throw new InternalServerErrorException(
                     `Failed to get deployment with code ${error.message}`,
+                );
+        }
+    }
+
+    async findDeployments(
+        filter?: RootFilterQuery<DeploymentDocument>,
+    ): Promise<DeploymentDocument[]> {
+        try {
+            return await this.deploymentModel.find(filter);
+        } catch (error) {
+            if (error instanceof Error)
+                throw new InternalServerErrorException(
+                    `Failed to find deployments with message: ${error.message}`,
+                );
+        }
+    }
+
+    async findOne(
+        filter: RootFilterQuery<DeploymentDocument>,
+    ): Promise<DeploymentDocument> {
+        try {
+            return await this.deploymentModel.findOne(filter);
+        } catch (error) {
+            if (error instanceof Error)
+                throw new InternalServerErrorException(
+                    `Failed to find deployment with message: ${error.message}`,
                 );
         }
     }
@@ -140,11 +153,8 @@ export class DeploymentService {
         try {
             await Promise.all(
                 modulesConfiguration.map(async (moduleConfiguration) => {
-                    const module = await this.moduleService.findOne({
-                        moduleId: moduleConfiguration.moduleId,
-                    });
                     await this.moduleDeploymentService.create({
-                        module,
+                        moduleId: moduleConfiguration.moduleId,
                         tag: moduleConfiguration.tag,
                         deployment,
                     });

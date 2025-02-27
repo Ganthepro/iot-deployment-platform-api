@@ -5,7 +5,7 @@ import {
     DeploymentDocument,
 } from '../deployment/deployment.schema';
 import * as autopopulate from 'mongoose-autopopulate';
-import { Module, ModuleDocument } from 'src/module/module.schema';
+import { Module as ModuleEnum } from '../shared/enums/module.enum';
 
 export type ModuleDeploymentDocument = HydratedDocument<ModuleDeployment>;
 
@@ -24,11 +24,10 @@ export class ModuleDeployment {
 
     @Prop({
         required: true,
-        type: mongoose.Schema.Types.ObjectId,
-        ref: Module.name,
-        autopopulate: true,
+        type: String,
+        enum: ModuleEnum,
     })
-    module: ModuleDocument;
+    moduleId: ModuleEnum;
 
     @Prop()
     tag?: string;

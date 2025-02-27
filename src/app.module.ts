@@ -10,7 +10,6 @@ import { ConnectivityGuard } from './registry/guards/connectivity.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GLOBAL_CONFIG } from './shared/constants/global-config.constant';
 import { ModuleDeploymentModule } from './module-deployment/module-deployment.module';
-import { ModuleModule } from './module/module.module';
 import { DeviceModule } from './device/device.module';
 import { ContainerModule } from './container/container.module';
 import * as dotenv from 'dotenv';
@@ -35,7 +34,6 @@ dotenv.config();
         RegistryModule,
         DeploymentModule,
         ModuleDeploymentModule,
-        ModuleModule,
         DeviceModule,
         ContainerModule,
     ],
