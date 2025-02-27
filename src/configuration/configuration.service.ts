@@ -56,12 +56,6 @@ export class ConfigurationService {
             return await this.ModuleConfigurationService.find({
                 configuration: id,
             });
-            // return moduleConfigurations.map((moduleConfiguration) => {
-            //     return {
-            //         moduleId: moduleConfiguration.moduleId,
-            //         tag: moduleConfiguration.tag,
-            //     };
-            // });
         } catch (error) {
             if (error instanceof Error)
                 throw new InternalServerErrorException(
@@ -192,22 +186,3 @@ export class ConfigurationService {
         return modulesConfiguration;
     }
 }
-
-// async addConfiguration(
-//     content: ConfigurationContent,
-//     modules: ModuleConfigurationDto[],
-// ): Promise<void> {
-//     try {
-//         content.modulesContent.$edgeAgent['properties.desired'].modules =
-//             this.modulesBuilder(modules);
-//         await this.configurationModel.create({
-
-//         })
-//         this.registryService.registry.addConfiguration();
-//     } catch (error) {
-//         if (error instanceof Error)
-//             throw new InternalServerErrorException(
-//                 `Failed to add configuration with message: ${error.message}`,
-//             );
-//     }
-// }

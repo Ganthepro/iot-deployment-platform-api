@@ -29,8 +29,11 @@ export class ModuleConfiguration {
     })
     moduleId: ModuleEnum;
 
-    @Prop()
-    tag?: string;
+    @Prop({
+        required: true,
+        type: String,
+    })
+    tag: string;
 }
 
 export const ModuleConfigurationSchema =

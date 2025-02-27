@@ -5,6 +5,7 @@ import {
     ModuleConfiguration,
     ModuleConfigurationDocument,
 } from './module-configuration.schema';
+import { Module } from 'src/shared/enums/module.enum';
 
 @Injectable()
 export class ModuleConfigurationService {
@@ -16,6 +17,16 @@ export class ModuleConfigurationService {
     async create(
         module: ModuleConfiguration,
     ): Promise<ModuleConfigurationDocument> {
+        switch (module.moduleId) {
+            case Module.Postgres:
+                module.tag = 'alpine3.20';
+                break;
+            case Module.RabbitMQ:
+                module.tag = '4.0-management';
+                break;
+            default:
+                break;
+        }
         return await this.ModuleConfigurationModel.create(module);
     }
 
