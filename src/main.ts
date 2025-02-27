@@ -33,7 +33,6 @@ async function bootstrap() {
 
     if (configService.getOrThrow<string>(GLOBAL_CONFIG.IS_DEVELOPMENT)) {
         const config = new DocumentBuilder()
-            .addBearerAuth()
             .setTitle('IOT Deployment Platform API')
             .setDescription(
                 'This is the IOT Deployment Platform API documentation',

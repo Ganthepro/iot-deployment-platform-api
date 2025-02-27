@@ -40,7 +40,7 @@ export class DeploymentResponseDto {
     createdAt: Date;
 
     constructor(deployment: DeploymentDocument) {
-        this.deviceId = deployment.device.deviceId;
+        this.deviceId = deployment.deviceId;
         this.configurationId = deployment.configuration;
         this.status = deployment.status;
         this.isLatest = deployment.isLatest;

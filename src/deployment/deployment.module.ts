@@ -5,7 +5,6 @@ import { DeploymentService } from './deployment.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Deployment, DeploymentSchemaFactory } from './deployment.schema';
 import { ModuleConfigurationModule } from '../module-configuration/module-configuration.module';
-import { DeviceModule } from '../device/device.module';
 import { ConfigurationModule } from 'src/configuration/configuration.module';
 
 @Module({
@@ -18,7 +17,6 @@ import { ConfigurationModule } from 'src/configuration/configuration.module';
             },
         ]),
         ModuleConfigurationModule,
-        DeviceModule,
         ConfigurationModule,
     ],
     controllers: [DeploymentController],

@@ -7,14 +7,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Deployment, DeploymentDocument } from './deployment.schema';
 import { Model, QueryOptions, RootFilterQuery, UpdateQuery } from 'mongoose';
 import { DeploymentStatus } from './enums/deployment-status.enum';
-import { DeviceService } from 'src/device/device.service';
 
 @Injectable()
 export class DeploymentService {
     constructor(
         @InjectModel(Deployment.name)
         private readonly deploymentModel: Model<DeploymentDocument>,
-        private readonly deviceService: DeviceService,
     ) {}
 
     async create(
@@ -22,11 +20,10 @@ export class DeploymentService {
         status: DeploymentStatus,
         configuration: string,
     ): Promise<DeploymentDocument> {
-        const device = await this.deviceService.findOne({ deviceId });
         try {
             return await this.deploymentModel.create({
                 status,
-                device: device._id,
+                deviceId,
                 configuration,
             });
         } catch (error) {
