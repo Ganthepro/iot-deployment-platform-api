@@ -7,8 +7,9 @@ import {
     Injectable,
     InternalServerErrorException,
     Post,
+    Query,
 } from '@nestjs/common';
-import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DeploymentService } from './deployment.service';
 import { CreateDeploymentDto } from './dtos/create-deployment.dto';
 import { ObjectId } from 'src/shared/decorators/object-id.decorator';
@@ -57,6 +58,35 @@ export class DeploymentController {
         @ObjectId('id') id: string,
     ): Promise<DeploymentResponseDto> {
         const deployments = await this.deploymentService.findOne({ _id: id });
+        return new DeploymentResponseDto(deployments);
+    }
+
+    @Get(':deviceId')
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'get deployment by device id',
+        isArray: true,
+        type: DeploymentResponseDto,
+    })
+    @ApiParam({
+        name: 'deviceId',
+        description: 'Device ID',
+        type: String,
+    })
+    @ApiQuery({
+        name: 'isLatest',
+        description: 'Get the latest deployment',
+        type: Boolean,
+        required: false,
+    })
+    async getDeploymentsByDeviceId(
+        @ObjectId('deviceId') deviceId: string,
+        @Query('isLatest') isLatest: boolean = false,
+    ): Promise<DeploymentResponseDto> {
+        const deployments = await this.deploymentService.findOne({
+            deviceId,
+            isLatest,
+        });
         return new DeploymentResponseDto(deployments);
     }
 
