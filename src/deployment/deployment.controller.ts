@@ -62,7 +62,7 @@ export class DeploymentController {
         return new DeploymentResponseDto(deployments);
     }
 
-    @Get(':deviceId')
+    @Get(':deviceId/by-device')
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'get deployment by device id',
