@@ -41,16 +41,7 @@ export class ModuleConfigurationDto {
     status?: 'running' | 'stopped';
 }
 
-export class ApplyConfigurationDto {
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty({
-        description: 'device id',
-        example: 'building-a',
-        type: String,
-    })
-    deviceId: string;
-
+export class CreateConfigurationDto {
     @IsString()
     @IsNotEmpty()
     @ApiProperty({

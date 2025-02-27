@@ -9,9 +9,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { ConnectivityGuard } from './registry/guards/connectivity.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GLOBAL_CONFIG } from './shared/constants/global-config.constant';
-import { ModuleDeploymentModule } from './module-deployment/module-deployment.module';
+import { ModuleConfigurationModule } from './module-configuration/module-configuration.module';
 import { DeviceModule } from './device/device.module';
 import { ContainerModule } from './container/container.module';
+import { ConfigurationModule } from './configuration/configuration.module';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -33,9 +34,10 @@ dotenv.config();
         }),
         RegistryModule,
         DeploymentModule,
-        ModuleDeploymentModule,
+        ModuleConfigurationModule,
         DeviceModule,
         ContainerModule,
+        ConfigurationModule,
     ],
     controllers: [AppController],
     providers: [

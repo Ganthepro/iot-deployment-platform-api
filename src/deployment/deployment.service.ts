@@ -1,81 +1,62 @@
 import {
-    BadRequestException,
     Injectable,
     InternalServerErrorException,
+    NotFoundException,
 } from '@nestjs/common';
-import { RegistryService } from '../registry/registry.service';
-import { ConfigurationContent, Module } from 'azure-iothub';
-import {
-    API,
-    DataLoggerAgent,
-    IQASensorAgent,
-    Postgres,
-    RabbitMQ,
-} from 'src/shared/configs/modules.config';
-import { ModuleConfigurationDto } from './dtos/apply-configuration.dto';
-import { Module as ModuleEnum } from '../shared/enums/module.enum';
 import { InjectModel } from '@nestjs/mongoose';
 import { Deployment, DeploymentDocument } from './deployment.schema';
-import { Model, RootFilterQuery } from 'mongoose';
+import { Model, QueryOptions, RootFilterQuery, UpdateQuery } from 'mongoose';
 import { DeploymentStatus } from './enums/deployment-status.enum';
-import { ModuleDeploymentService } from 'src/module-deployment/module-deployment.service';
 import { DeviceService } from 'src/device/device.service';
-import { ModuleDeploymentDocument } from 'src/module-deployment/module-deployment.schema';
 
 @Injectable()
 export class DeploymentService {
     constructor(
         @InjectModel(Deployment.name)
         private readonly deploymentModel: Model<DeploymentDocument>,
-        private readonly moduleDeploymentService: ModuleDeploymentService,
-        private readonly registryService: RegistryService,
         private readonly deviceService: DeviceService,
     ) {}
 
-    async getDeployments(): Promise<ModuleDeploymentDocument[]> {
+    async create(
+        deviceId: string,
+        status: DeploymentStatus,
+        configuration: string,
+    ): Promise<DeploymentDocument> {
+        const device = await this.deviceService.findOne({ deviceId });
         try {
-            return await this.moduleDeploymentService.findAll();
-        } catch (error) {
-            if (error instanceof Error)
-                throw new InternalServerErrorException(
-                    `Failed to get deployments with message: ${error.message}`,
-                );
-        }
-    }
-
-    async getDeployment(
-        deploymentId: string,
-    ): Promise<ModuleDeploymentDocument[]> {
-        try {
-            return await this.moduleDeploymentService.findAll({
-                deployment: deploymentId,
+            return await this.deploymentModel.create({
+                status,
+                device: device._id,
+                configuration,
             });
         } catch (error) {
             if (error instanceof Error)
                 throw new InternalServerErrorException(
-                    `Failed to get deployment modules with message: ${error.message}`,
+                    `Failed to create deployment with message: ${error.message}`,
                 );
         }
     }
 
-    async getConfiguration(
-        deploymentId: string,
-    ): Promise<ConfigurationContent> {
+    async update(
+        filter: RootFilterQuery<DeploymentDocument>,
+        update: UpdateQuery<DeploymentDocument>,
+        options: QueryOptions<DeploymentDocument> = { new: true },
+    ): Promise<DeploymentDocument> {
         try {
-            const response =
-                await this.registryService.registry.getConfiguration(
-                    deploymentId,
-                );
-            return response.responseBody.content;
+            return await this.deploymentModel.findOneAndUpdate(
+                filter,
+                update,
+                options,
+            );
         } catch (error) {
             if (error instanceof Error)
                 throw new InternalServerErrorException(
-                    `Failed to get deployment with code ${error.message}`,
+                    `Failed to update deployment with message: ${error.message}`,
                 );
         }
     }
 
-    async findDeployments(
+    async find(
         filter?: RootFilterQuery<DeploymentDocument>,
     ): Promise<DeploymentDocument[]> {
         try {
@@ -92,116 +73,15 @@ export class DeploymentService {
         filter: RootFilterQuery<DeploymentDocument>,
     ): Promise<DeploymentDocument> {
         try {
-            return await this.deploymentModel.findOne(filter);
+            const deployment = await this.deploymentModel.findOne(filter);
+            if (!deployment)
+                throw new NotFoundException('Deployment not found');
+            return deployment;
         } catch (error) {
             if (error instanceof Error)
                 throw new InternalServerErrorException(
                     `Failed to find deployment with message: ${error.message}`,
                 );
         }
-    }
-
-    async applyConfiguration(
-        deviceId: string,
-        content: ConfigurationContent,
-        modules: ModuleConfigurationDto[],
-    ): Promise<void> {
-        const device = await this.deviceService.findOne({ deviceId });
-        try {
-            content.modulesContent.$edgeAgent['properties.desired'].modules =
-                this.modulesBuilder(modules);
-            await this.registryService.registry.applyConfigurationContentOnDevice(
-                deviceId,
-                content,
-            );
-            const deployment = await this.deploymentModel.create({
-                device,
-                status: DeploymentStatus.Success,
-            });
-            await this.createModules(modules, deployment);
-        } catch (error) {
-            await this.deploymentModel.create({
-                device,
-                status: DeploymentStatus.Failure,
-            });
-            if (error instanceof Error)
-                throw new InternalServerErrorException(
-                    `Failed to apply configuration with message: ${error.message}`,
-                );
-        }
-    }
-
-    async getModules(deviceId: string): Promise<Module[]> {
-        try {
-            const response =
-                await this.registryService.registry.getModulesOnDevice(
-                    deviceId,
-                );
-            return response.responseBody;
-        } catch (error) {
-            if (error instanceof Error)
-                throw new InternalServerErrorException(
-                    `Failed to get configurations with message: ${error.message}`,
-                );
-        }
-    }
-
-    async createModules(
-        modulesConfiguration: ModuleConfigurationDto[],
-        deployment: DeploymentDocument,
-    ) {
-        try {
-            await Promise.all(
-                modulesConfiguration.map(async (moduleConfiguration) => {
-                    await this.moduleDeploymentService.create({
-                        moduleId: moduleConfiguration.moduleId,
-                        tag: moduleConfiguration.tag,
-                        deployment,
-                    });
-                }),
-            );
-        } catch (error) {
-            if (error instanceof Error)
-                throw new InternalServerErrorException(
-                    `Failed to create modules with message: ${error.message}`,
-                );
-        }
-    }
-
-    private modulesBuilder(modules: ModuleConfigurationDto[]) {
-        const modulesConfiguration = {};
-        modules.forEach(async (module) => {
-            switch (module.moduleId) {
-                case ModuleEnum.DataLoggerAgent:
-                    modulesConfiguration[ModuleEnum.DataLoggerAgent] =
-                        DataLoggerAgent(module.status, module.tag);
-                    break;
-                case ModuleEnum.IQASensorAgent:
-                    modulesConfiguration[ModuleEnum.IQASensorAgent] =
-                        IQASensorAgent(module.status, module.tag);
-                    break;
-                case ModuleEnum.Postgres:
-                    modulesConfiguration[ModuleEnum.Postgres] = Postgres(
-                        module.status,
-                    );
-                    break;
-                case ModuleEnum.RabbitMQ:
-                    modulesConfiguration[ModuleEnum.RabbitMQ] = RabbitMQ(
-                        module.status,
-                    );
-                    break;
-                case ModuleEnum.API:
-                    modulesConfiguration[ModuleEnum.API] = API(
-                        module.status,
-                        module.tag,
-                    );
-                    break;
-                default:
-                    throw new BadRequestException(
-                        `Module ${module.moduleId} not found`,
-                    );
-            }
-        });
-        return modulesConfiguration;
     }
 }

@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { RegistryService } from './registry.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Device } from 'azure-iothub';
+import { DeviceResponseDto } from './dtos/device-response.dto';
 
 @Controller('registry')
 @Injectable()
@@ -30,10 +30,11 @@ export class RegistryController {
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'list all devices',
-        type: Device,
+        type: DeviceResponseDto,
         isArray: true,
     })
     async getDevices() {
-        return await this.registryService.getDevices();
+        const device = await this.registryService.getDevices();
+        return device.map((device) => new DeviceResponseDto(device));
     }
 }

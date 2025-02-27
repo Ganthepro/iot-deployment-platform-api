@@ -42,10 +42,13 @@ export class RegistryService implements OnModuleInit {
     }
 
     async getDevices(): Promise<Device[]> {
-        const response = await this.registry.list();
-        if (response.httpResponse.complete) return response.responseBody;
-        throw new InternalServerErrorException(
-            `Failed to list devices with code ${response.httpResponse.statusCode}`,
-        );
+        try {
+            const response = await this.registry.list();
+            if (response.httpResponse.complete) return response.responseBody;
+        } catch {
+            throw new ServiceUnavailableException(
+                'Failed to retrieve devices from registry',
+            );
+        }
     }
 }

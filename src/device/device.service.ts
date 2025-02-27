@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import {
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+    OnModuleInit,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, RootFilterQuery } from 'mongoose';
 import { DeviceDocument, Device } from './device.schema';
@@ -31,10 +36,12 @@ export class DeviceService implements OnModuleInit {
         filter: RootFilterQuery<DeviceDocument>,
     ): Promise<DeviceDocument> {
         try {
-            return await this.deviceModel.findOne(filter);
+            const device = await this.deviceModel.findOne(filter);
+            if (!device) throw new NotFoundException('Device not found');
+            return device;
         } catch (error) {
             if (error instanceof Error) {
-                throw new NotFoundException(
+                throw new InternalServerErrorException(
                     `Failed to find device with code ${error.message}`,
                 );
             }

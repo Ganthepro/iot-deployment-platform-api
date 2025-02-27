@@ -3,6 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { DeploymentStatus } from './enums/deployment-status.enum';
 import { DeviceDocument, Device } from '../device/device.schema';
 import * as autopopulate from 'mongoose-autopopulate';
+import { Configuration } from 'src/configuration/configuration.schema';
 
 export type DeploymentDocument = HydratedDocument<Deployment>;
 
@@ -21,9 +22,22 @@ export class Deployment {
 
     @Prop({
         required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Configuration.name,
+    })
+    configuration: string;
+
+    @Prop({
+        required: true,
         enum: DeploymentStatus,
     })
     status: DeploymentStatus;
+
+    @Prop({
+        required: true,
+        default: true,
+    })
+    isLatest: boolean;
 
     @Prop()
     createdAt: Date;

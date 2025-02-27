@@ -1,26 +1,26 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import {
-    Deployment,
-    DeploymentDocument,
-} from '../deployment/deployment.schema';
+    Configuration,
+    ConfigurationDocument,
+} from '../configuration/configuration.schema';
 import * as autopopulate from 'mongoose-autopopulate';
 import { Module as ModuleEnum } from '../shared/enums/module.enum';
 
-export type ModuleDeploymentDocument = HydratedDocument<ModuleDeployment>;
+export type ModuleConfigurationDocument = HydratedDocument<ModuleConfiguration>;
 
 @Schema({
     timestamps: false,
     versionKey: false,
 })
-export class ModuleDeployment {
+export class ModuleConfiguration {
     @Prop({
         required: true,
         type: mongoose.Schema.Types.ObjectId,
-        ref: Deployment.name,
+        ref: Configuration.name,
         autopopulate: true,
     })
-    deployment: DeploymentDocument;
+    configuration: ConfigurationDocument;
 
     @Prop({
         required: true,
@@ -33,11 +33,11 @@ export class ModuleDeployment {
     tag?: string;
 }
 
-export const ModuleDeploymentSchema =
-    SchemaFactory.createForClass(ModuleDeployment);
+export const ModuleConfigurationSchema =
+    SchemaFactory.createForClass(ModuleConfiguration);
 
-export const ModuleDeploymentSchemaFactory = () => {
-    const schema = ModuleDeploymentSchema;
+export const ModuleConfigurationSchemaFactory = () => {
+    const schema = ModuleConfigurationSchema;
     schema.plugin(autopopulate as any);
     return schema;
 };

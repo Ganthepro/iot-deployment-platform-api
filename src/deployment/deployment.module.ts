@@ -4,8 +4,9 @@ import { DeploymentController } from './deployment.controller';
 import { DeploymentService } from './deployment.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Deployment, DeploymentSchemaFactory } from './deployment.schema';
-import { ModuleDeploymentModule } from '../module-deployment/module-deployment.module';
+import { ModuleConfigurationModule } from '../module-configuration/module-configuration.module';
 import { DeviceModule } from '../device/device.module';
+import { ConfigurationModule } from 'src/configuration/configuration.module';
 
 @Module({
     imports: [
@@ -16,8 +17,9 @@ import { DeviceModule } from '../device/device.module';
                 useFactory: DeploymentSchemaFactory,
             },
         ]),
-        ModuleDeploymentModule,
+        ModuleConfigurationModule,
         DeviceModule,
+        ConfigurationModule,
     ],
     controllers: [DeploymentController],
     providers: [DeploymentService],
