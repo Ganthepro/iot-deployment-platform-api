@@ -5,6 +5,13 @@ import { ApiProperty } from '@nestjs/swagger';
 export class DeploymentResponseDto {
     @ApiProperty({
         type: String,
+        description: 'Deployment Id',
+        example: '60e4b4d4d1c7f0001f000001',
+    })
+    id: string;
+
+    @ApiProperty({
+        type: String,
         description: 'Device Id',
         example: 'building-a',
     })
@@ -40,6 +47,7 @@ export class DeploymentResponseDto {
     createdAt: Date;
 
     constructor(deployment: DeploymentDocument) {
+        this.id = deployment.id;
         this.deviceId = deployment.deviceId;
         this.configurationId = deployment.configuration;
         this.status = deployment.status;
