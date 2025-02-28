@@ -158,27 +158,20 @@ export class ConfigurationService {
             switch (module.moduleId) {
                 case ModuleEnum.DataLoggerAgent:
                     modulesConfiguration[ModuleEnum.DataLoggerAgent] =
-                        DataLoggerAgent(module.status, module.tag);
+                        DataLoggerAgent(module.tag);
                     break;
                 case ModuleEnum.IQASensorAgent:
                     modulesConfiguration[ModuleEnum.IQASensorAgent] =
-                        IQASensorAgent(module.status, module.tag);
+                        IQASensorAgent(module.tag);
                     break;
                 case ModuleEnum.Postgres:
-                    modulesConfiguration[ModuleEnum.Postgres] = Postgres(
-                        module.status,
-                    );
+                    modulesConfiguration[ModuleEnum.Postgres] = Postgres();
                     break;
                 case ModuleEnum.RabbitMQ:
-                    modulesConfiguration[ModuleEnum.RabbitMQ] = RabbitMQ(
-                        module.status,
-                    );
+                    modulesConfiguration[ModuleEnum.RabbitMQ] = RabbitMQ();
                     break;
                 case ModuleEnum.API:
-                    modulesConfiguration[ModuleEnum.API] = API(
-                        module.status,
-                        module.tag,
-                    );
+                    modulesConfiguration[ModuleEnum.API] = API(module.tag);
                     break;
                 default:
                     throw new BadRequestException(

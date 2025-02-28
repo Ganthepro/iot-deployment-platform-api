@@ -30,15 +30,6 @@ export class ModuleConfigurationDto {
         type: String,
     })
     tag?: string;
-
-    @IsString()
-    @IsOptional()
-    @ApiPropertyOptional({
-        description: 'module version',
-        example: 'running',
-        type: String,
-    })
-    status?: 'running' | 'stopped';
 }
 
 export class CreateConfigurationDto {

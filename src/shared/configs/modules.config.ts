@@ -1,9 +1,6 @@
 import { Module } from '../enums/module.enum';
 
-export const RabbitMQ = (
-    status: 'running' | 'stopped' = 'running',
-    tag: string = '4.0-management',
-) => {
+export const RabbitMQ = (tag: string = '4.0-management') => {
     return {
         restartPolicy: 'always',
         settings: {
@@ -11,15 +8,12 @@ export const RabbitMQ = (
             createOptions:
                 '{"HostConfig":{"PortBindings":{"5672/tcp":[{"HostPort":"5672"}],"15672/tcp":[{"HostPort":"15672"}]}}}',
         },
-        status,
+        status: 'running',
         type: 'docker',
     };
 };
 
-export const Postgres = (
-    status: 'running' | 'stopped' = 'running',
-    tag: string = 'alpine3.20',
-) => {
+export const Postgres = (tag: string = 'alpine3.20') => {
     return {
         env: {
             POSTGRES_USER: {
@@ -38,15 +32,12 @@ export const Postgres = (
             createOptions:
                 '{"HostConfig":{"PortBindings":{"5432/tcp":[{"HostPort":"5432"}]}}}',
         },
-        status,
+        status: 'running',
         type: 'docker',
     };
 };
 
-export const API = (
-    status: 'running' | 'stopped' = 'running',
-    tag: string = 'latest',
-) => {
+export const API = (tag: string = 'latest') => {
     return {
         env: {
             DB_USERNAME: {
@@ -68,15 +59,12 @@ export const API = (
             createOptions:
                 '{"HostConfig":{"PortBindings":{"8000/tcp":[{"HostPort":"8000"}]}}}',
         },
-        status,
+        status: 'running',
         type: 'docker',
     };
 };
 
-export const DataLoggerAgent = (
-    status: 'running' | 'stopped' = 'running',
-    tag: string = 'latest',
-) => {
+export const DataLoggerAgent = (tag: string = 'latest') => {
     return {
         env: {
             DB_USERNAME: {
@@ -99,15 +87,12 @@ export const DataLoggerAgent = (
         settings: {
             image: `tamtikorn.azurecr.io/${Module.DataLoggerAgent}:${tag}`,
         },
-        status,
+        status: 'running',
         type: 'docker',
     };
 };
 
-export const IQASensorAgent = (
-    status: 'running' | 'stopped' = 'running',
-    tag: string = 'latest',
-) => {
+export const IQASensorAgent = (tag: string = 'latest') => {
     return {
         env: {
             DB_USERNAME: {
@@ -130,7 +115,7 @@ export const IQASensorAgent = (
         settings: {
             image: `tamtikorn.azurecr.io/${Module.IQASensorAgent}:${tag}`,
         },
-        status,
+        status: 'running',
         type: 'docker',
     };
 };
