@@ -105,12 +105,13 @@ export class DeploymentController {
     async create(
         @Body() createDeploymentDto: CreateDeploymentDto,
     ): Promise<DeploymentResponseDto> {
+        const configurationId = createDeploymentDto.configurationId;
         const configuration = await this.configurationService.findOne({
-            _id: createDeploymentDto.configuration,
+            configurationId,
         });
         if (configuration.status === ConfigurationStatus.NotDeployed)
             await this.configurationService.update(
-                { _id: createDeploymentDto.configuration },
+                { configurationId },
                 { status: ConfigurationStatus.Deployed },
             );
         const content = await this.configurationService.getConfigurationContent(

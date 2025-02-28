@@ -20,7 +20,7 @@ export class DeploymentResponseDto {
     @ApiProperty({
         type: String,
         description: 'Configuration Id',
-        example: '60e4b4d4d1c7f0001f000001',
+        example: 'configuration-1',
     })
     configurationId: string;
 
@@ -49,7 +49,7 @@ export class DeploymentResponseDto {
     constructor(deployment: DeploymentDocument) {
         this.id = deployment.id;
         this.deviceId = deployment.deviceId;
-        this.configurationId = deployment.configuration;
+        this.configurationId = deployment.configuration.configurationId;
         this.status = deployment.status;
         this.isLatest = deployment.isLatest;
         this.createdAt = deployment.createdAt;

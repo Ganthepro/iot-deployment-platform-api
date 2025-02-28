@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateDeploymentDto {
     @IsString()
@@ -11,12 +11,12 @@ export class CreateDeploymentDto {
     })
     deviceId: string;
 
-    @IsMongoId()
+    @IsString()
     @IsNotEmpty()
     @ApiProperty({
         description: 'configuration id',
-        example: '60f0c5c7f6b8b2b4b3b5b6b7',
+        example: 'configuration-1',
         type: String,
     })
-    configuration: string;
+    configurationId: string;
 }
