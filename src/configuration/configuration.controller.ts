@@ -34,7 +34,7 @@ export class ConfigurationController {
         try {
             const content =
                 await this.configurationService.getConfigurationContent(
-                    createConfigurationDto.baseTemplatedeploymentId,
+                    createConfigurationDto.baseTemplateConfigurationId,
                 );
             const modules = createConfigurationDto.modules;
             content.modulesContent.$edgeAgent['properties.desired'].modules =

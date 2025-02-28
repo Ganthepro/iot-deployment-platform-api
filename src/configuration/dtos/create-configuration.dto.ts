@@ -49,7 +49,7 @@ export class CreateConfigurationDto {
         example: 'base-template',
         type: String,
     })
-    baseTemplatedeploymentId: string;
+    baseTemplateConfigurationId: string;
 
     @IsString()
     @IsNotEmpty()
