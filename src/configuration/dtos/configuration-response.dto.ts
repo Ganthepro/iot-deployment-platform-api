@@ -18,8 +18,16 @@ export class ConfigurationResponseDto {
     })
     status: ConfigurationStatus;
 
+    @ApiProperty({
+        description: 'Configuration Id',
+        example: new Date(),
+        type: Date,
+    })
+    configurationId: string;
+
     constructor(configuration: ConfigurationDocument) {
         this.id = configuration.id;
         this.status = configuration.status;
+        this.configurationId = configuration.configurationId;
     }
 }
