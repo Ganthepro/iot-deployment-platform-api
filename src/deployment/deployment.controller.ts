@@ -109,7 +109,7 @@ export class DeploymentController {
         const configuration = await this.configurationService.findOne({
             configurationId,
         });
-        if (configuration.status === ConfigurationStatus.NotDeployed)
+        if (configuration.status === ConfigurationStatus.NeverDeployed)
             await this.configurationService.update(
                 { configurationId },
                 { status: ConfigurationStatus.Deployed },
