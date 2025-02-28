@@ -102,7 +102,7 @@ export class ConfigurationController {
     @ApiParam({
         name: 'configurationId',
         required: true,
-        example: '60f3b3b3b3b3b3b3b3b3b3',
+        example: 'configuration-1',
         description: 'configuration id',
     })
     async getModules(
