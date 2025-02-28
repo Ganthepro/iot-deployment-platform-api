@@ -6,13 +6,13 @@ import {
     HttpStatus,
     Injectable,
     InternalServerErrorException,
+    Param,
     Post,
 } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ConfigurationService } from './configuration.service';
 import { CreateConfigurationDto } from './dtos/create-configuration.dto';
 import { ConfigurationResponseDto } from './dtos/configuration-response.dto';
-import { ObjectId } from 'src/shared/decorators/object-id.decorator';
 import { ConfigurationModuleResponseDto } from './dtos/configuration-module-response.dto';
 
 @Controller('configuration')
@@ -68,29 +68,29 @@ export class ConfigurationController {
         );
     }
 
-    @Get(':id')
+    @Get(':configurationId')
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'get configuration',
         type: ConfigurationResponseDto,
     })
     @ApiParam({
-        name: 'id',
+        name: 'configurationId',
         description: 'configuration id',
-        example: '60f3b3b3b3b3b3b3b3b3b3b3',
+        example: 'configuration-1',
         required: true,
         type: String,
     })
     async getConfiguration(
-        @ObjectId('id') id: string,
+        @Param('configurationId') configurationId: string,
     ): Promise<ConfigurationResponseDto> {
         const configuration = await this.configurationService.findOne({
-            _id: id,
+            configurationId,
         });
         return new ConfigurationResponseDto(configuration);
     }
 
-    @Get(':id/modules')
+    @Get(':configurationId/modules')
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'list all modules',
@@ -98,15 +98,20 @@ export class ConfigurationController {
         type: ConfigurationModuleResponseDto,
     })
     @ApiParam({
-        name: 'id',
+        name: 'configurationId',
         required: true,
         example: '60f3b3b3b3b3b3b3b3b3b3',
         description: 'configuration id',
     })
     async getModules(
-        @ObjectId('id') id: string,
+        @Param('configurationId') configurationId: string,
     ): Promise<ConfigurationModuleResponseDto[]> {
-        const modules = await this.configurationService.getModules(id);
+        const configuration = await this.configurationService.findOne({
+            configurationId,
+        });
+        const modules = await this.configurationService.getModules(
+            configuration.id,
+        );
         return modules.map(
             (module) => new ConfigurationModuleResponseDto(module),
         );

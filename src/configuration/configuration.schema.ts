@@ -11,6 +11,13 @@ export type ConfigurationDocument = HydratedDocument<Configuration>;
 export class Configuration {
     @Prop({
         required: true,
+        type: String,
+        unique: true,
+    })
+    configurationId: string;
+
+    @Prop({
+        required: true,
         enum: ConfigurationStatus,
         default: ConfigurationStatus.NotDeployed,
     })

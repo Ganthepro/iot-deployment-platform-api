@@ -51,6 +51,15 @@ export class CreateConfigurationDto {
     })
     baseTemplatedeploymentId: string;
 
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({
+        description: 'configuration id',
+        example: 'configuration-1',
+        type: String,
+    })
+    configurationId: string;
+
     @IsArray()
     @IsNotEmpty()
     @ApiProperty({

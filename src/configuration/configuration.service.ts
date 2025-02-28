@@ -51,10 +51,10 @@ export class ConfigurationService {
         }
     }
 
-    async getModules(id: string) {
+    async getModules(configurationId: string) {
         try {
             return await this.ModuleConfigurationService.find({
-                configuration: id,
+                configurationId,
             });
         } catch (error) {
             if (error instanceof Error)
