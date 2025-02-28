@@ -1,4 +1,4 @@
 export enum DeploymentStatus {
-    Success = 'success',
-    Failure = 'failure',
+    Success = 'Success',
+    Failure = 'Failure',
 }

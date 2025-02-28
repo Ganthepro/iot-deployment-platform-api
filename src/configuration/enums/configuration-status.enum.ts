@@ -1,4 +1,4 @@
 export enum ConfigurationStatus {
-    NotDeployed = 'notDeployed',
-    Deployed = 'deployed',
+    NotDeployed = 'Not Deployed',
+    Deployed = 'Deployed',
 }
