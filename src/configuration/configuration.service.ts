@@ -66,9 +66,12 @@ export class ConfigurationService {
 
     async create(
         content: ConfigurationContent,
+        configurationId: string,
     ): Promise<ConfigurationDocument> {
         try {
-            const configuration = await this.configurationModel.create({});
+            const configuration = await this.configurationModel.create({
+                configurationId,
+            });
             await this.registryService.registry.addConfiguration({
                 id: configuration.id,
                 content,

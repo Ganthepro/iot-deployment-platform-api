@@ -39,8 +39,10 @@ export class ConfigurationController {
             const modules = createConfigurationDto.modules;
             content.modulesContent.$edgeAgent['properties.desired'].modules =
                 this.configurationService.modulesBuilder(modules);
-            const configuration =
-                await this.configurationService.create(content);
+            const configuration = await this.configurationService.create(
+                content,
+                createConfigurationDto.configurationId,
+            );
             await this.configurationService.createModules(
                 modules,
                 configuration,
