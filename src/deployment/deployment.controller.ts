@@ -5,7 +5,6 @@ import {
     HttpCode,
     HttpStatus,
     Injectable,
-    InternalServerErrorException,
     Param,
     Post,
     Query,
@@ -117,11 +116,11 @@ export class DeploymentController {
         const content = await this.configurationService.getConfigurationContent(
             configuration.id,
         );
+        await this.registryService.registry.applyConfigurationContentOnDevice(
+            createDeploymentDto.deviceId,
+            content,
+        );
         try {
-            await this.registryService.registry.applyConfigurationContentOnDevice(
-                createDeploymentDto.deviceId,
-                content,
-            );
             await this.deploymentService.update(
                 {
                     deviceId: createDeploymentDto.deviceId,
@@ -131,21 +130,12 @@ export class DeploymentController {
                     isLatest: false,
                 },
             );
-            const deployment = await this.deploymentService.create(
-                createDeploymentDto.deviceId,
-                DeploymentStatus.Success,
-                configuration.id,
-            );
-            return new DeploymentResponseDto(deployment);
-        } catch (error) {
-            await this.deploymentService.create(
-                createDeploymentDto.deviceId,
-                DeploymentStatus.Failure,
-                configuration.id,
-            );
-            throw new InternalServerErrorException(
-                `Failed to apply configuration with message: ${error.message}`,
-            );
-        }
+        } catch {}
+        const deployment = await this.deploymentService.create(
+            createDeploymentDto.deviceId,
+            DeploymentStatus.Success,
+            configuration.id,
+        );
+        return new DeploymentResponseDto(deployment);
     }
 }
