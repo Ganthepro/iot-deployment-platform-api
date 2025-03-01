@@ -124,6 +124,7 @@ export class DeploymentController {
             );
             await this.deploymentService.update(
                 {
+                    deviceId: createDeploymentDto.deviceId,
                     isLatest: true,
                 },
                 {
