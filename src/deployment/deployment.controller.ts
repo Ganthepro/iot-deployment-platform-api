@@ -5,6 +5,7 @@ import {
     HttpCode,
     HttpStatus,
     Injectable,
+    InternalServerErrorException,
     Param,
     Post,
     Query,
@@ -114,13 +115,13 @@ export class DeploymentController {
                 { status: ConfigurationStatus.Deployed },
             );
         const content = await this.configurationService.getConfigurationContent(
-            configuration.id,
-        );
-        await this.registryService.registry.applyConfigurationContentOnDevice(
-            createDeploymentDto.deviceId,
-            content,
+            configuration.configurationId,
         );
         try {
+            await this.registryService.registry.applyConfigurationContentOnDevice(
+                createDeploymentDto.deviceId,
+                content,
+            );
             await this.deploymentService.update(
                 {
                     deviceId: createDeploymentDto.deviceId,
@@ -130,12 +131,22 @@ export class DeploymentController {
                     isLatest: false,
                 },
             );
-        } catch {}
-        const deployment = await this.deploymentService.create(
-            createDeploymentDto.deviceId,
-            DeploymentStatus.Success,
-            configuration.id,
-        );
-        return new DeploymentResponseDto(deployment);
+            const deployment = await this.deploymentService.create(
+                createDeploymentDto.deviceId,
+                DeploymentStatus.Success,
+                configuration.id,
+            );
+            return new DeploymentResponseDto(deployment);
+        } catch (error) {
+            await this.deploymentService.create(
+                createDeploymentDto.deviceId,
+                DeploymentStatus.Failure,
+                configuration.id,
+            );
+            if (error instanceof Error)
+                throw new InternalServerErrorException(
+                    `Failed to apply configuration with message: ${error.message}`,
+                );
+        }
     }
 }
