@@ -73,7 +73,7 @@ export class ConfigurationService {
                 configurationId,
             });
             await this.registryService.registry.addConfiguration({
-                id: configuration.id,
+                id: configuration.configurationId,
                 content,
                 schemaVersion: '1.0',
             });
