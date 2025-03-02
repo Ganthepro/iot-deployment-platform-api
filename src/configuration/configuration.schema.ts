@@ -19,7 +19,7 @@ export class Configuration {
     @Prop({
         required: true,
         enum: ConfigurationStatus,
-        default: ConfigurationStatus.NeverDeployed,
+        default: ConfigurationStatus.Undeployed,
     })
     status: ConfigurationStatus;
 }

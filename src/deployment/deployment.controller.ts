@@ -87,7 +87,9 @@ export class DeploymentController {
         @Query('isLatest') isLatest: boolean = false,
     ): Promise<DeploymentResponseDto[]> {
         const deployments = await this.deploymentService.find({
-            deviceId,
+            deviceId: {
+                $in: [deviceId],
+            },
             isLatest,
         });
         return deployments.map(
@@ -109,28 +111,33 @@ export class DeploymentController {
         const configuration = await this.configurationService.findOne({
             configurationId,
         });
-        if (configuration.status === ConfigurationStatus.NeverDeployed)
-            await this.configurationService.update(
-                { configurationId },
-                { status: ConfigurationStatus.Deployed },
-            );
-        const content = await this.configurationService.getConfigurationContent(
-            configuration.configurationId,
-        );
         try {
-            await this.registryService.registry.applyConfigurationContentOnDevice(
-                createDeploymentDto.deviceId,
-                content,
-            );
-            await this.deploymentService.update(
-                {
-                    deviceId: createDeploymentDto.deviceId,
-                    isLatest: true,
-                },
-                {
-                    isLatest: false,
-                },
-            );
+            if (configuration.status === ConfigurationStatus.Undeployed)
+                await this.configurationService.update(
+                    { configurationId },
+                    { status: ConfigurationStatus.Deployed },
+                );
+            const content =
+                await this.configurationService.getConfigurationContent(
+                    configuration.configurationId,
+                );
+            createDeploymentDto.deviceId.forEach(async (deviceId) => {
+                await this.registryService.registry.applyConfigurationContentOnDevice(
+                    deviceId,
+                    content,
+                );
+                await this.deploymentService.update(
+                    {
+                        deviceId: {
+                            $in: [deviceId],
+                        },
+                        isLatest: true,
+                    },
+                    {
+                        isLatest: false,
+                    },
+                );
+            });
             const deployment = await this.deploymentService.create(
                 createDeploymentDto.deviceId,
                 DeploymentStatus.Success,
@@ -142,6 +149,7 @@ export class DeploymentController {
                 createDeploymentDto.deviceId,
                 DeploymentStatus.Failure,
                 configuration.id,
+                false,
             );
             if (error instanceof Error)
                 throw new InternalServerErrorException(

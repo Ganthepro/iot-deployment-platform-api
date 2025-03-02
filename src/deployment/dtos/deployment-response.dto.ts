@@ -12,10 +12,11 @@ export class DeploymentResponseDto {
 
     @ApiProperty({
         type: String,
-        description: 'Device Id',
-        example: 'building-a',
+        description: 'Device Ids',
+        example: ['building-a'],
+        isArray: true,
     })
-    deviceId: string;
+    deviceId: string[];
 
     @ApiProperty({
         type: String,

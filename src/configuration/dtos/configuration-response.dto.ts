@@ -12,7 +12,7 @@ export class ConfigurationResponseDto {
 
     @ApiProperty({
         description: 'status of the configuration',
-        example: ConfigurationStatus.NeverDeployed,
+        example: ConfigurationStatus.Undeployed,
         enum: ConfigurationStatus,
         type: String,
     })

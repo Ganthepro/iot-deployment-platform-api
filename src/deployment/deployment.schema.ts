@@ -16,9 +16,9 @@ export type DeploymentDocument = HydratedDocument<Deployment>;
 export class Deployment {
     @Prop({
         required: true,
-        type: String,
+        type: [String],
     })
-    deviceId: string;
+    deviceId: string[];
 
     @Prop({
         required: true,

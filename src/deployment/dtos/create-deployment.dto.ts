@@ -1,15 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateDeploymentDto {
-    @IsString()
-    @IsNotEmpty()
+    @IsString({ each: true })
+    @IsArray()
     @ApiProperty({
-        description: 'device id',
-        example: 'building-a',
+        description: 'device ids',
+        example: ['building-a'],
         type: String,
+        isArray: true,
     })
-    deviceId: string;
+    deviceId: string[];
 
     @IsString()
     @IsNotEmpty()

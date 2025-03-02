@@ -16,15 +16,17 @@ export class DeploymentService {
     ) {}
 
     async create(
-        deviceId: string,
+        deviceId: string[],
         status: DeploymentStatus,
         configuration: string,
+        isLatest: boolean = true,
     ): Promise<DeploymentDocument> {
         try {
             return await this.deploymentModel.create({
                 status,
                 deviceId,
                 configuration,
+                isLatest,
             });
         } catch (error) {
             if (error instanceof Error)
