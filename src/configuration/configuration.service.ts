@@ -65,18 +65,20 @@ export class ConfigurationService {
     }
 
     async create(
-        content: ConfigurationContent,
+        content: ConfigurationContent | null,
         configurationId: string,
     ): Promise<ConfigurationDocument> {
         try {
             const configuration = await this.configurationModel.create({
                 configurationId,
             });
-            await this.registryService.registry.addConfiguration({
-                id: configuration.configurationId,
-                content,
-                schemaVersion: '1.0',
-            });
+            if (content) {
+                await this.registryService.registry.addConfiguration({
+                    id: configuration.configurationId,
+                    content,
+                    schemaVersion: '1.0',
+                });
+            }
             return configuration;
         } catch (error) {
             if (error instanceof Error)

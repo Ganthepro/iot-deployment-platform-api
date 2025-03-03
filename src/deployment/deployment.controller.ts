@@ -19,6 +19,8 @@ import { ConfigurationService } from 'src/configuration/configuration.service';
 import { RegistryService } from 'src/registry/registry.service';
 import { DeploymentStatus } from './enums/deployment-status.enum';
 import { ConfigurationStatus } from 'src/configuration/enums/configuration-status.enum';
+import { AutoUpdateDto } from './dtos/auto-update.dto';
+import { v4 } from 'uuid';
 
 @Injectable()
 @Controller('deployment')
@@ -29,6 +31,67 @@ export class DeploymentController {
         private readonly configurationService: ConfigurationService,
         private readonly registryService: RegistryService,
     ) {}
+
+    @Post('auto-update')
+    @ApiResponse({
+        status: HttpStatus.NO_CONTENT,
+        description: 'auto update deployment',
+    })
+    async autoUpdate(@Body() autoUpdateDto: AutoUpdateDto): Promise<void> {
+        const uuid = v4();
+        const modules = autoUpdateDto.modules;
+        const content = await this.configurationService.getConfigurationContent(
+            autoUpdateDto.baseTemplateConfigurationId,
+        );
+        content.modulesContent.$edgeAgent['properties.desired'].modules =
+            this.configurationService.modulesBuilder(modules);
+        const configurations = await this.configurationService.create(
+            null,
+            `auto-update-${uuid}`,
+        );
+        await this.configurationService.createModules(modules, configurations);
+        try {
+            await Promise.all(
+                autoUpdateDto.deviceId.map(async (deviceId) => {
+                    this.registryService.registry.applyConfigurationContentOnDevice(
+                        deviceId,
+                        content,
+                    );
+                    await this.deploymentService.update(
+                        {
+                            isLatest: true,
+                            deviceId: {
+                                $in: [deviceId],
+                            },
+                        },
+                        {
+                            isLatest: false,
+                        },
+                    );
+                }),
+            );
+            await this.deploymentService.create(
+                autoUpdateDto.deviceId,
+                DeploymentStatus.Success,
+                configurations.id,
+            );
+            await this.configurationService.update(
+                { _id: configurations.id },
+                { status: ConfigurationStatus.Deployed },
+            );
+        } catch (error) {
+            await this.deploymentService.create(
+                autoUpdateDto.deviceId,
+                DeploymentStatus.Failure,
+                configurations.id,
+                false,
+            );
+            if (error instanceof Error)
+                throw new InternalServerErrorException(
+                    `Failed to apply configuration with message: ${error.message}`,
+                );
+        }
+    }
 
     @Get()
     @ApiResponse({
