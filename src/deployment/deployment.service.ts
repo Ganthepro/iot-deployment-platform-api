@@ -59,7 +59,9 @@ export class DeploymentService {
         filter?: RootFilterQuery<DeploymentDocument>,
     ): Promise<DeploymentDocument[]> {
         try {
-            return await this.deploymentModel.find(filter);
+            return await this.deploymentModel
+                .find(filter)
+                .sort({ createdAt: -1 });
         } catch (error) {
             if (error instanceof Error)
                 throw new InternalServerErrorException(

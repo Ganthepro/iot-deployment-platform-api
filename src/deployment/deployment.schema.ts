@@ -34,12 +34,6 @@ export class Deployment {
     })
     status: DeploymentStatus;
 
-    @Prop({
-        required: true,
-        default: true,
-    })
-    isLatest: boolean;
-
     @Prop()
     createdAt: Date;
 

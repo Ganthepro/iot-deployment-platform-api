@@ -153,8 +153,8 @@ export class DeploymentController {
             deviceId: {
                 $in: [deviceId],
             },
-            isLatest,
         });
+        if (isLatest) return [new DeploymentResponseDto(deployments[0])];
         return deployments.map(
             (deployment) => new DeploymentResponseDto(deployment),
         );
@@ -184,23 +184,25 @@ export class DeploymentController {
                 await this.configurationService.getConfigurationContent(
                     configuration.configurationId,
                 );
-            createDeploymentDto.deviceId.forEach(async (deviceId) => {
-                await this.registryService.registry.applyConfigurationContentOnDevice(
-                    deviceId,
-                    content,
-                );
-                await this.deploymentService.update(
-                    {
-                        deviceId: {
-                            $in: [deviceId],
+            await Promise.all(
+                createDeploymentDto.deviceId.map(async (deviceId) => {
+                    await this.registryService.registry.applyConfigurationContentOnDevice(
+                        deviceId,
+                        content,
+                    );
+                    await this.deploymentService.update(
+                        {
+                            deviceId: {
+                                $in: [deviceId],
+                            },
+                            isLatest: true,
                         },
-                        isLatest: true,
-                    },
-                    {
-                        isLatest: false,
-                    },
-                );
-            });
+                        {
+                            isLatest: false,
+                        },
+                    );
+                }),
+            );
             const deployment = await this.deploymentService.create(
                 createDeploymentDto.deviceId,
                 DeploymentStatus.Success,

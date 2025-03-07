@@ -6,7 +6,7 @@ services:
     image: iot-platform-api
     build:
       context: .
-    restart: unless-stopped
+    restart: always
     env_file:
       - .env
     environment:

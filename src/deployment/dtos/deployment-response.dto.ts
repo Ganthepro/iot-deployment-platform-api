@@ -34,13 +34,6 @@ export class DeploymentResponseDto {
     status: DeploymentStatus;
 
     @ApiProperty({
-        type: Boolean,
-        description: 'Is deployment used',
-        example: false,
-    })
-    isLatest: boolean;
-
-    @ApiProperty({
         type: Date,
         description: 'Deployment creation date',
         example: new Date(),
@@ -52,7 +45,6 @@ export class DeploymentResponseDto {
         this.deviceId = deployment.deviceId;
         this.configurationId = deployment.configuration.configurationId;
         this.status = deployment.status;
-        this.isLatest = deployment.isLatest;
         this.createdAt = deployment.createdAt;
     }
 }
