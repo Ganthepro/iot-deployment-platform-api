@@ -210,16 +210,18 @@ export class DeploymentController {
             );
             return new DeploymentResponseDto(deployment);
         } catch (error) {
-            await this.deploymentService.create(
-                createDeploymentDto.deviceId,
-                DeploymentStatus.Failure,
-                configuration.id,
-                false,
-            );
-            if (error instanceof Error)
+            if (error instanceof Error) {
+                await this.deploymentService.create(
+                    createDeploymentDto.deviceId,
+                    DeploymentStatus.Failure,
+                    configuration.id,
+                    false,
+                    error.message,
+                );
                 throw new InternalServerErrorException(
                     `Failed to apply configuration with message: ${error.message}`,
                 );
+            }
         }
     }
 }

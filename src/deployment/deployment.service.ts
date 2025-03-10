@@ -20,6 +20,7 @@ export class DeploymentService {
         status: DeploymentStatus,
         configuration: string,
         isLatest: boolean = true,
+        message: string = null,
     ): Promise<DeploymentDocument> {
         try {
             return await this.deploymentModel.create({
@@ -27,6 +28,7 @@ export class DeploymentService {
                 deviceId,
                 configuration,
                 isLatest,
+                message,
             });
         } catch (error) {
             if (error instanceof Error)

@@ -34,6 +34,13 @@ export class Deployment {
     })
     status: DeploymentStatus;
 
+    @Prop({
+        required: true,
+        type: String,
+        default: null,
+    })
+    message?: string;
+
     @Prop()
     createdAt: Date;
 

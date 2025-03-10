@@ -34,6 +34,13 @@ export class DeploymentResponseDto {
     status: DeploymentStatus;
 
     @ApiProperty({
+        type: String,
+        description: 'Deployment message',
+        example: 'Deployment failed',
+    })
+    message?: string;
+
+    @ApiProperty({
         type: Date,
         description: 'Deployment creation date',
         example: new Date(),
@@ -46,5 +53,6 @@ export class DeploymentResponseDto {
         this.configurationId = deployment.configuration.configurationId;
         this.status = deployment.status;
         this.createdAt = deployment.createdAt;
+        this.message = deployment.message;
     }
 }
